@@ -4,10 +4,10 @@
 #Se importan las librerías
 import pandas as pd
 import numpy as np
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 import math
-#import random
+import random
 
 
 #========================================================================================================#
@@ -35,6 +35,9 @@ def log_regression4(X, y, alpha, epochs):
     loss_last_epoch = avg_loss #*
 
   return best_params
+
+
+
 #=======================================================================================================#
 
 
@@ -85,7 +88,7 @@ actual_y = {'GPA Alto':0,
 
 for key, y_nivel in y_niveles.items():
   # Split dataset (training and testing sets)
-  X_train, X_test, y_train, y_test = train_test_split(X, y_nivel, test_size=0.2, random_state=0)
+  X_train, X_test, y_train, y_test = train_test_split(X, y_nivel, test_size=0.2, random_state=42)
   # Scale X
   sc = StandardScaler()
   X_train = sc.fit_transform(X_train)
