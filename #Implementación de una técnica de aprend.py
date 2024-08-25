@@ -1,3 +1,4 @@
+#GPA
 #Implementación de una técnica de aprendizaje máquina sin el uso de un framework
 #========================================================================================================#
 #========================================================================================================#
@@ -5,7 +6,6 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
 import math
 import random
 
@@ -28,7 +28,7 @@ def log_regression4(X, y, alpha, epochs):
     grad = (1/N) * X_vect.T.dot(sigmoid_x_theta - y_) # shapes: (5,150).(150,1) = (5, 1)
     best_params = theta
     theta = theta - (alpha * grad)
-    hyp = sigmoid_function(X_vect.dot(theta)) # shape (150,5).(5,1) = (150,1)
+    hyp = sigmoid_function(X_vect.dot(theta)) #
     avg_loss = -np.sum(np.dot(y_.T, np.log(hyp) + np.dot((1-y_).T, np.log(1-hyp)))) / len(hyp)
     avg_loss_list.append(avg_loss)
     loss_step = abs(loss_last_epoch - avg_loss) #*
@@ -36,6 +36,23 @@ def log_regression4(X, y, alpha, epochs):
 
   return best_params
 
+def train_test_split(X, Y, test_size):        
+  Y=Y.to_frame('Y')#Se pasa de serie a columna para unirla
+  data=pd.concat([X,Y],axis=1)
+
+  data=data.sample(frac=1).reset_index(drop=True)#Se cambia el orden de los datos, se devuelven todas las filas
+  #, se resetea el índice y se elimina el antiguo índice
+  numero_para_test=int(len(data) * test_size) #Numero de filas que se tomarán
+
+  test=data[:numero_para_test]
+  train=data[numero_para_test:]
+
+  X_train=train.drop(columns='Y')
+  y_train=train['Y']
+  X_test=test.drop(columns='Y')
+  y_test=test['Y']
+
+  return X_train, X_test, y_train, y_test
 
 
 #=======================================================================================================#
@@ -58,6 +75,7 @@ df['GPA_Categoria'] = df['GPA'].apply(categorizacion_gpa)#Hace una nueva columna
 df = pd.get_dummies(df, columns=['Major'], drop_first=True)
 
 #Hacemos columnas binarias
+df['Gender'] = df['Gender'].replace({'Female': 1, 'Male': 0})#
 df['PartTimeJob'] = df['PartTimeJob'].replace({'Yes': 1, 'No': 0})#
 df['ExtraCurricularActivities'] = df['ExtraCurricularActivities'].replace({'Yes': 1, 'No': 0})#
 df['Major_Business'] = df['Major_Business'].astype(int)
@@ -71,7 +89,7 @@ y_medio = (df["GPA_Categoria"] == 1).astype(int)
 y_bajo = (df["GPA_Categoria"] == 2).astype(int)
 
 
-X=df.drop(columns=['Gender','GPA_Categoria','GPA','StudentID'])
+X=df.drop(columns=['GPA_Categoria','GPA','StudentID'])
 
 # Listq de ys
 y_niveles = [y_alto, y_medio, y_bajo]
@@ -88,7 +106,8 @@ actual_y = {'GPA Alto':0,
 
 for key, y_nivel in y_niveles.items():
   # Split dataset (training and testing sets)
-  X_train, X_test, y_train, y_test = train_test_split(X, y_nivel, test_size=0.2, random_state=42)
+  X_train, X_test, y_train, y_test = train_test_split(X, y_nivel, test_size=0.2)
+
   # Scale X
   sc = StandardScaler()
   X_train = sc.fit_transform(X_train)
@@ -98,7 +117,7 @@ for key, y_nivel in y_niveles.items():
   alpha = 1
   best_params = log_regression4(X_train, y_train, alpha, epochs)
   # Make predictions on test set
-  index_ = 4
+  index_ = 0
   X_to_predict = [list(X_test[index_])]
   # print(X_to_predict)
   X_to_predict = np.c_[np.ones((len(X_to_predict), 1)), X_to_predict] # add x0 for bias
