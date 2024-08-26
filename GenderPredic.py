@@ -45,10 +45,10 @@ def train_test_split(X, Y, test_size):
   #, se resetea el índice y se elimina el antiguo índice
   numero_para_test=int(len(data) * test_size) #Numero de filas que se tomarán
 
-  test=data[:numero_para_test]
+  test=data[:numero_para_test] #Separamos en test y train
   train=data[numero_para_test:]
 
-  X_train=train.drop(columns='Y')
+  X_train=train.drop(columns='Y') #Se separan en X y Y
   y_train=train['Y']
   X_test=test.drop(columns='Y')
   y_test=test['Y']
@@ -115,6 +115,7 @@ for key, y_nivel in y_niveles.items():
   print('Our model calculated probability of sample being {}, is: {}%'.format(key, round(pred_probability[0][0]*100,2)))
   actual_y[key] = y_test.iloc[index_]
 
+#Evaluación
 max_key = max(predicted_probs, key=predicted_probs.get)
 print('\n', predicted_probs)
 print('\nModel Prediction: {}'.format(max_key))
